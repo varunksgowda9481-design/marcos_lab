@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Varun Lifts - Diet Plan Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(120deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 100%;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+        }
+
+        .logo {
+            font-size: 3rem;
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #3498db;
+            font-size: 1.8rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: block;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: #3498db;
+            color: white;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+        }
+
+        .diet-plan {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .water-intake {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(to right, #3498db, #2980b9);
+            border-radius: 15px;
+            margin: 25px 0;
+            color: white;
+        }
+
+        .water-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .macro-bar {
+            display: flex;
+            height: 35px;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .protein {
+            background: #3498db;
+        }
+
+        .carbs {
+            background: #e74c3c;
+        }
+
+        .fat {
+            background: #f1c40f;
+        }
+
+        .fiber {
+            background: #2ecc71;
+        }
+
+        .macro-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .macro-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .macro-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .macro-label {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        .meal-card {
+            background: #f8f9fa;
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .meal-title {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .food-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .recipe-tip {
+            background: #fff8e1;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #f39c12;
+        }
+
+        .toggle-recipes {
+            margin: 20px 0;
+            cursor: pointer;
+            color: #3498db;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: inline-block;
+        }
+
+        .recipes-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .recipe {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .recipe-title {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            font-size: 1.3rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-veg {
+            background: #27ae60;
+            color: white;
+        }
+
+        .badge-nonveg {
+            background: #e74c3c;
+            color: white;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 30px;
+            color: white;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .macro-summary {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .form-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-dumbbell"></i>
+            </div>
+            <h1>Varun Lifts Diet Planner</h1>
+            <p>Get your personalized diet plan based on your goals and preferences</p>
+        </header>
+        
+        <div class="card">
+            <h2 class="card-title">Personal Information</h2>
+            <form id="diet-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="age"><i class="fas fa-birthday-cake"></i> Age</label>
+                        <input type="number" id="age" min="15" max="80" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="height"><i class="fas fa-ruler-vertical"></i> Height (cm)</label>
+                        <input type="number" id="height" min="100" max="250" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="weight"><i class="fas fa-weight"></i> Weight (kg)</label>
+                        <input type="number" id="weight" min="30" max="200" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gender"><i class="fas fa-venus-mars"></i> Gender</label>
+                        <select id="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="workout"><i class="fas fa-running"></i> Workout Routine</label>
+                        <select id="workout" required>
+                            <option value="">Select Routine</option>
+                            <option value="sedentary">Sedentary (little to no exercise)</option>
+                            <option value="light">Light (exercise 1-3 days/week)</option>
+                            <option value="moderate">Moderate (exercise 3-5 days/week)</option>
+                            <option value="active">Active (exercise 6-7 days/week)</option>
+                            <option value="very-active">Very Active (intense exercise daily)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="goal"><i class="fas fa-bullseye"></i> Fitness Goal</label>
+                        <select id="goal" required>
+                            <option value="">Select Goal</option>
+                            <option value="fatloss">Fat Loss</option>
+                            <option value="musclegain">Muscle Gain</option>
+                            <option value="maintain">Maintain Weight</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-utensils"></i> Diet Preference</label>
+                    <div class="tabs">
+                        <div class="tab active" data-tab="veg">Vegetarian</div>
+                        <div class="tab" data-tab="nonveg">Non-Vegetarian</div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-calculator"></i> Generate Diet Plan
+                </button>
+            </form>
+        </div>
+        
+        <div class="diet-plan" id="diet-plan">
+            <div class="card">
+                <h2 class="card-title">Your Personalized Diet Plan</h2>
+                
+                <div class="water-intake">
+                    <div class="water-icon">💧</div>
+                    <h3>Water Intake: Minimum 3 Liters Daily</h3>
+                    <p>Stay hydrated throughout the day for optimal results</p>
+                </div>
+                
+                <h3>Daily Macros Breakdown</h3>
+                <div class="macro-bar">
+                    <div class="protein" style="width: 30%;">Protein 30%</div>
+                    <div class="carbs" style="width: 40%;">Carbs 40%</div>
+                    <div class="fat" style="width: 20%;">Fat 20%</div>
+                    <div class="fiber" style="width: 10%;">Fiber 10%</div>
+                </div>
+                
+                <div class="macro-summary">
+                    <div class="macro-item">
+                        <div class="macro-value" id="protein-value">0g</div>
+                        <div class="macro-label">Protein</div>
+                    </div>
+                    <div class="macro-item">
+                        <div class="macro-value" id="carbs-value">0g</div>
+                        <div class="macro-label">Carbohydrates</div>
+                    </div>
+                    <div class="macro-item">
+                        <div class="macro-value" id="fat-value">0g</div>
+                        <div class="macro-label">Fat</div>
+                    </div>
+                    <div class="macro-item">
+                        <div class="macro-value" id="fiber-value">0g</div>
+                        <div class="macro-label">Fiber</div>
+                    </div>
+                </div>
+                
+                <div id="meal-plan">
+                    <!-- Meal plan will be generated here -->
+                </div>
+                
+                <div class="recipe-tip">
+                    <h3><i class="fas fa-lightbulb"></i> Cooking Tips</h3>
+                    <p>• Soak chia seeds for at least 30 minutes before consumption</p>
+                    <p>• Use non-stick pans to reduce oil usage</p>
+                    <p>• Steam vegetables instead of boiling to retain nutrients</p>
+                    <p>• Marinate paneer/chicken in yogurt to keep it tender</p>
+                    <p>• Cook rice with a 1:2 ratio of rice to water for perfect texture</p>
+                    <p>• Roast oats before cooking to enhance flavor</p>
+                </div>
+                
+                <div class="toggle-recipes" id="toggle-recipes">
+                    <i class="fas fa-chevron-down"></i> Show Recipes
+                </div>
+                
+                <div class="recipes-container" id="recipes-container">
+                    <h3>Easy Recipes</h3>
+                    
+                    <div class="recipe">
+                        <h4 class="recipe-title">Oats Porridge</h4>
+                        <p><span class="badge badge-veg">Veg</span></p>
+                        <p><strong>Ingredients:</strong> 50g oats, 200ml milk, 1 banana, 1 tsp chia seeds</p>
+                        <p><strong>Instructions:</strong> Cook oats in milk for 5-7 minutes. Add sliced banana and chia seeds. Serve warm.</p>
+                    </div>
+                    
+                    <div class="recipe">
+                        <h4 class="recipe-title">Paneer Bhurji</h4>
+                        <p><span class="badge badge-veg">Veg</span></p>
+                        <p><strong>Ingredients:</strong> 100g paneer, 1 onion, 1 tomato, spices</p>
+                        <p><strong>Instructions:</strong> Sauté onions until golden. Add tomatoes and spices. Crumble paneer into the mixture and cook for 5 minutes.</p>
+                    </div>
+                    
+                    <div class="recipe">
+                        <h4 class="recipe-title">Grilled Chicken</h4>
+                        <p><span class="badge badge-nonveg">Non-Veg</span></p>
+                        <p><strong>Ingredients:</strong> 150g chicken breast, lemon juice, herbs, spices</p>
+                        <p><strong>Instructions:</strong> Marinate chicken in lemon juice and spices for 30 minutes. Grill for 6-7 minutes each side until fully cooked.</p>
+                    </div>
+                    
+                    <div class="recipe">
+                        <h4 class="recipe-title">Soya Chunk Curry</h4>
+                        <p><span class="badge badge-veg">Veg</span></p>
+                        <p><strong>Ingredients:</strong> 50g soya chunks, 1 onion, 1 tomato, spices</p>
+                        <p><strong>Instructions:</strong> Soak soya chunks in warm water for 15 minutes. Squeeze out water. Prepare curry base with onions and tomatoes, add spices and soya chunks. Simmer for 10 minutes.</p>
+                    </div>
+                    
+                    <div class="recipe">
+                        <h4 class="recipe-title">Beetroot-Carrot Salad</h4>
+                        <p><span class="badge badge-veg">Veg</span></p>
+                        <p><strong>Ingredients:</strong> 1 beetroot, 1 carrot, lemon juice, salt, pepper</p>
+                        <p><strong>Instructions:</strong> Grate beetroot and carrot. Mix with lemon juice, salt, and pepper. Serve fresh.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>© 2023 Varun Lifts Diet Planner | Disclaimer: Consult with a healthcare provider before making significant dietary changes.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('diet-form');
+            const dietPlanSection = document.getElementById('diet-plan');
+            const mealPlanContainer = document.getElementById('meal-plan');
+            const tabs = document.querySelectorAll('.tab');
+            const toggleRecipes = document.getElementById('toggle-recipes');
+            const recipesContainer = document.getElementById('recipes-container');
+            let dietPreference = 'veg';
+            
+            // Tab selection
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    dietPreference = this.getAttribute('data-tab');
+                });
+            });
+            
+            // Toggle recipes
+            toggleRecipes.addEventListener('click', function() {
+                if (recipesContainer.style.display === 'block') {
+                    recipesContainer.style.display = 'none';
+                    toggleRecipes.innerHTML = '<i class="fas fa-chevron-down"></i> Show Recipes';
+                } else {
+                    recipesContainer.style.display = 'block';
+                    toggleRecipes.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Recipes';
+                }
+            });
+            
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const age = parseInt(document.getElementById('age').value);
+                const height = parseInt(document.getElementById('height').value);
+                const weight = parseInt(document.getElementById('weight').value);
+                const gender = document.getElementById('gender').value;
+                const workout = document.getElementById('workout').value;
+                const goal = document.getElementById('goal').value;
+                
+                if (!age || !height || !weight || !gender || !workout || !goal) {
+                    alert('Please fill all fields');
+                    return;
+                }
+                
+                // Calculate BMI and BMR
+                const bmi = calculateBMI(height, weight);
+                const bmr = calculateBMR(age, height, weight, gender);
+                
+                // Calculate daily calories based on goal and activity
+                const calories = calculateCalories(bmr, workout, goal);
+                
+                // Generate diet plan
+                generateDietPlan(calories, goal, dietPreference);
+                
+                // Show the diet plan section
+                dietPlanSection.style.display = 'block';
+                
+                // Scroll to the diet plan
+                dietPlanSection.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            function calculateBMI(height, weight) {
+                // Convert height to meters
+                const heightInMeters = height / 100;
+                return weight / (heightInMeters * heightInMeters);
+            }
+            
+            function calculateBMR(age, height, weight, gender) {
+                if (gender === 'male') {
+                    return 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+                } else {
+                    return 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+                }
+            }
+            
+            function calculateCalories(bmr, activityLevel, goal) {
+                const activityMultipliers = {
+                    'sedentary': 1.2,
+                    'light': 1.375,
+                    'moderate': 1.55,
+                    'active': 1.725,
+                    'very-active': 1.9
+                };
+                
+                let calories = bmr * activityMultipliers[activityLevel];
+                
+                // Adjust calories based on goal
+                if (goal === 'fatloss') {
+                    calories -= 500; // Create a deficit for fat loss
+                } else if (goal === 'musclegain') {
+                    calories += 500; // Create a surplus for muscle gain
+                }
+                // Maintain weight doesn't need adjustment
+                
+                return Math.round(calories);
+            }
+            
+            function generateDietPlan(calories, goal, preference) {
+                // Clear previous meal plan
+                mealPlanContainer.innerHTML = '';
+                
+                // Define meals
+                const meals = [
+                    { name: 'Breakfast', time: '8:00 AM' },
+                    { name: 'Mid-Morning Snack', time: '11:00 AM' },
+                    { name: 'Lunch', time: '1:30 PM' },
+                    { name: 'Evening Snack', time: '4:30 PM' },
+                    { name: 'Dinner', time: '7:00 PM' }
+                ];
+                
+                // Initialize macro totals
+                let totalProtein = 0;
+                let totalCarbs = 0;
+                let totalFat = 0;
+                let totalFiber = 0;
+                
+                // Generate meal plan based on preference
+                if (preference === 'veg') {
+                    const result = generateVegPlan(meals, calories, goal);
+                    totalProtein = result.totalProtein;
+                    totalCarbs = result.totalCarbs;
+                    totalFat = result.totalFat;
+                    totalFiber = result.totalFiber;
+                } else {
+                    const result = generateNonVegPlan(meals, calories, goal);
+                    totalProtein = result.totalProtein;
+                    totalCarbs = result.totalCarbs;
+                    totalFat = result.totalFat;
+                    totalFiber = result.totalFiber;
+                }
+                
+                // Update macro summary
+                document.getElementById('protein-value').textContent = `${totalProtein}g`;
+                document.getElementById('carbs-value').textContent = `${totalCarbs}g`;
+                document.getElementById('fat-value').textContent = `${totalFat}g`;
+                document.getElementById('fiber-value').textContent = `${totalFiber}g`;
+            }
+            
+            function generateVegPlan(meals, calories, goal) {
+                let totalProtein = 0;
+                let totalCarbs = 0;
+                let totalFat = 0;
+                let totalFiber = 0;
+                
+                meals.forEach(meal => {
+                    const mealCard = document.createElement('div');
+                    mealCard.className = 'meal-card';
+                    
+                    const mealTitle = document.createElement('div');
+                    mealTitle.className = 'meal-title';
+                    mealTitle.innerHTML = `<i class="fas fa-utensils"></i> ${meal.name} (${meal.time})`;
+                    
+                    mealCard.appendChild(mealTitle);
+                    
+                    let foodItems = [];
+                    
+                    switch(meal.name) {
+                        case 'Breakfast':
+                            foodItems = [
+                                { name: 'Oats', quantity: '50g', protein: 6, carbs: 30, fat: 3, fiber: 5 },
+                                { name: 'Banana', quantity: '1 medium', protein: 1, carbs: 27, fat: 0, fiber: 3 },
+                                { name: 'Milk', quantity: '200ml', protein: 7, carbs: 9, fat: 4, fiber: 0 }
+                            ];
+                            break;
+                        case 'Mid-Morning Snack':
+                            foodItems = [
+                                { name: 'Paneer', quantity: '100g', protein: 18, carbs: 3, fat: 20, fiber: 0 },
+                                { name: 'Carrot', quantity: '1 medium', protein: 1, carbs: 6, fat: 0, fiber: 2 }
+                            ];
+                            break;
+                        case 'Lunch':
+                            foodItems = [
+                                { name: 'Brown Rice', quantity: '100g cooked', protein: 3, carbs: 23, fat: 1, fiber: 2 },
+                                { name: 'Soya Chunks', quantity: '50g', protein: 25, carbs: 10, fat: 1, fiber: 6 },
+                                { name: 'Salad (Beetroot, Carrot)', quantity: '1 bowl', protein: 2, carbs: 10, fat: 0, fiber: 4 }
+                            ];
+                            break;
+                        case 'Evening Snack':
+                            foodItems = [
+                                { name: 'Chia Seeds Pudding', quantity: '1 bowl', protein: 5, carbs: 10, fat: 9, fiber: 8 },
+                                { name: 'Handful of Nuts', quantity: '20g', protein: 4, carbs: 2, fat: 10, fiber: 1 }
+                            ];
+                            break;
+                        case 'Dinner':
+                            foodItems = [
+                                { name: 'Paneer Bhurji', quantity: '100g paneer', protein: 18, carbs: 5, fat: 20, fiber: 0 },
+                                { name: 'Roti', quantity: '2 pieces', protein: 6, carbs: 30, fat: 2, fiber: 5 },
+                                { name: 'Green Salad', quantity: '1 bowl', protein: 2, carbs: 5, fat: 0, fiber: 3 }
+                            ];
+                            break;
+                    }
+                    
+                    // Adjust quantities based on goal
+                    if (goal === 'fatloss') {
+                        // Slightly reduce carbs for fat loss
+                        foodItems.forEach(item => {
+                            if (item.carbs > 5) item.carbs = Math.round(item.carbs * 0.8);
+                        });
+                    } else if (goal === 'musclegain') {
+                        // Increase protein for muscle gain
+                        foodItems.forEach(item => {
+                            if (item.protein > 5) item.protein = Math.round(item.protein * 1.2);
+                        });
+                    }
+                    
+                    // Add to totals
+                    foodItems.forEach(item => {
+                        totalProtein += item.protein;
+                        totalCarbs += item.carbs;
+                        totalFat += item.fat;
+                        totalFiber += item.fiber;
+                    });
+                    
+                    // Add food items to meal card
+                    foodItems.forEach(item => {
+                        const foodItem = document.createElement('div');
+                        foodItem.className = 'food-item';
+                        
+                        const foodName = document.createElement('span');
+                        foodName.textContent = `${item.name} (${item.quantity})`;
+                        
+                        const foodMacros = document.createElement('span');
+                        foodMacros.innerHTML = `<strong>P:</strong> ${item.protein}g <strong>C:</strong> ${item.carbs}g <strong>F:</strong> ${item.fat}g <strong>Fib:</strong> ${item.fiber}g`;
+                        
+                        foodItem.appendChild(foodName);
+                        foodItem.appendChild(foodMacros);
+                        mealCard.appendChild(foodItem);
+                    });
+                    
+                    // Add recipe tip for some meals
+                    if (meal.name === 'Dinner') {
+                        const recipeTip = document.createElement('div');
+                        recipeTip.className = 'recipe-tip';
+                        recipeTip.innerHTML = `<strong>Recipe Tip:</strong> For Paneer Bhurji, sauté onions, tomatoes, and spices first, then add crumbled paneer. Cook for 5-7 minutes and garnish with coriander leaves.`;
+                        mealCard.appendChild(recipeTip);
+                    }
+                    
+                    if (meal.name === 'Evening Snack') {
+                        const recipeTip = document.createElement('div');
+                        recipeTip.className = 'recipe-tip';
+                        recipeTip.innerHTML = `<strong>Recipe Tip:</strong> For Chia Pudding, mix 2 tbsp chia seeds with 1 cup milk and let it sit overnight. Add honey and fruits before serving.`;
+                        mealCard.appendChild(recipeTip);
+                    }
+                    
+                    mealPlanContainer.appendChild(mealCard);
+                });
+                
+                return {
+                    totalProtein: Math.round(totalProtein),
+                    totalCarbs: Math.round(totalCarbs),
+                    totalFat: Math.round(totalFat),
+                    totalFiber: Math.round(totalFiber)
+                };
+            }
+            
+            function generateNonVegPlan(meals, calories, goal) {
+                let totalProtein = 0;
+                let totalCarbs = 0;
+                let totalFat = 0;
+                let totalFiber = 0;
+                
+                meals.forEach(meal => {
+                    const mealCard = document.createElement('div');
+                    mealCard.className = 'meal-card';
+                    
+                    const mealTitle = document.createElement('div');
+                    mealTitle.className = 'meal-title';
+                    mealTitle.innerHTML = `<i class="fas fa-utensils"></i> ${meal.name} (${meal.time})`;
+                    
+                    mealCard.appendChild(mealTitle);
+                    
+                    let foodItems = [];
+                    
+                    switch(meal.name) {
+                        case 'Breakfast':
+                            foodItems = [
+                                { name: 'Oats', quantity: '50g', protein: 6, carbs: 30, fat: 3, fiber: 5 },
+                                { name: 'Banana', quantity: '1 medium', protein: 1, carbs: 27, fat: 0, fiber: 3 },
+                                { name: 'Boiled Eggs', quantity: '2 eggs', protein: 12, carbs: 1, fat: 10, fiber: 0 }
+                            ];
+                            break;
+                        case 'Mid-Morning Snack':
+                            foodItems = [
+                                { name: 'Greek Yogurt', quantity: '150g', protein: 15, carbs: 6, fat: 4, fiber: 0 },
+                                { name: 'Handful of Nuts', quantity: '20g', protein: 4, carbs: 2, fat: 10, fiber: 1 }
+                            ];
+                            break;
+                        case 'Lunch':
+                            foodItems = [
+                                { name: 'Brown Rice', quantity: '100g cooked', protein: 3, carbs: 23, fat: 1, fiber: 2 },
+                                { name: 'Grilled Chicken', quantity: '150g', protein: 35, carbs: 0, fat: 6, fiber: 0 },
+                                { name: 'Salad (Beetroot, Carrot)', quantity: '1 bowl', protein: 2, carbs: 10, fat: 0, fiber: 4 }
+                            ];
+                            break;
+                        case 'Evening Snack':
+                            foodItems = [
+                                { name: 'Chia Seeds Smoothie', quantity: '1 glass', protein: 10, carbs: 15, fat: 8, fiber: 7 },
+                                { name: 'Boiled Egg', quantity: '1 egg', protein: 6, carbs: 1, fat: 5, fiber: 0 }
+                            ];
+                            break;
+                        case 'Dinner':
+                            foodItems = [
+                                { name: 'Grilled Fish', quantity: '200g', protein: 40, carbs: 0, fat: 10, fiber: 0 },
+                                { name: 'Quinoa', quantity: '80g cooked', protein: 4, carbs: 25, fat: 2, fiber: 3 },
+                                { name: 'Steamed Vegetables', quantity: '1 bowl', protein: 3, carbs: 12, fat: 0, fiber: 5 }
+                            ];
+                            break;
+                    }
+                    
+                    // Adjust quantities based on goal
+                    if (goal === 'fatloss') {
+                        // Slightly reduce carbs for fat loss
+                        foodItems.forEach(item => {
+                            if (item.carbs > 5) item.carbs = Math.round(item.carbs * 0.8);
+                        });
+                    } else if (goal === 'musclegain') {
+                        // Increase protein for muscle gain
+                        foodItems.forEach(item => {
+                            if (item.protein > 5) item.protein = Math.round(item.protein * 1.2);
+                        });
+                    }
+                    
+                    // Add to totals
+                    foodItems.forEach(item => {
+                        totalProtein += item.protein;
+                        totalCarbs += item.carbs;
+                        totalFat += item.fat;
+                        totalFiber += item.fiber;
+                    });
+                    
+                    // Add food items to meal card
+                    foodItems.forEach(item => {
+                        const foodItem = document.createElement('div');
+                        foodItem.className = 'food-item';
+                        
+                        const foodName = document.createElement('span');
+                        foodName.textContent = `${item.name} (${item.quantity})`;
+                        
+                        const foodMacros = document.createElement('span');
+                        foodMacros.innerHTML = `<strong>P:</strong> ${item.protein}g <strong>C:</strong> ${item.carbs}g <strong>F:</strong> ${item.fat}g <strong>Fib:</strong> ${item.fiber}g`;
+                        
+                        foodItem.appendChild(foodName);
+                        foodItem.appendChild(foodMacros);
+                        mealCard.appendChild(foodItem);
+                    });
+                    
+                    // Add recipe tip for some meals
+                    if (meal.name === 'Lunch') {
+                        const recipeTip = document.createElement('div');
+                        recipeTip.className = 'recipe-tip';
+                        recipeTip.innerHTML = `<strong>Recipe Tip:</strong> Marinate chicken in yogurt, ginger-garlic paste, and spices for 30 minutes before grilling for tender and flavorful chicken.`;
+                        mealCard.appendChild(recipeTip);
+                    }
+                    
+                    if (meal.name === 'Dinner') {
+                        const recipeTip = document.createElement('div');
+                        recipeTip.className = 'recipe-tip';
+                        recipeTip.innerHTML = `<strong>Recipe Tip:</strong> For grilled fish, brush with olive oil, lemon juice, and herbs. Grill 4-5 minutes each side until flaky.`;
+                        mealCard.appendChild(recipeTip);
+                    }
+                    
+                    mealPlanContainer.appendChild(mealCard);
+                });
+                
+                return {
+                    totalProtein: Math.round(totalProtein),
+                    totalCarbs: Math.round(totalCarbs),
+                    totalFat: Math.round(totalFat),
+                    totalFiber: Math.round(totalFiber)
+                };
+            }
+        });
+    </script>
+</body>
+</html>
