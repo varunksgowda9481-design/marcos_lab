@@ -5,8 +5,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 
+const cookieParser = require('cookie-parser');
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname)));
 
 const dbConfig = {
@@ -29,7 +31,11 @@ app.post('/api/register', async (req,res)=>{
     if (rows.length) return res.status(400).json({error:'Email already registered'});
     const hash = await bcrypt.hash(password,10);
     await pool.query('INSERT INTO users (name,email,password) VALUES (?,?,?)',[name,email,hash]);
-    res.json({ok:true});
+  // Optionally sign token and set cookie
+  const secret = process.env.JWT_SECRET || 'dev_jwt_secret_change_me';
+  const token = jwt.sign({email, name}, secret, {expiresIn: '7d'});
+  res.cookie('ml_token', token, {httpOnly: true, sameSite: 'Lax'});
+  res.json({ok:true, token});
   }catch(err){
     console.error(err);
     res.status(500).json({error:'Server error'});
@@ -48,8 +54,9 @@ app.post('/api/login', async (req,res)=>{
     if (!ok) return res.status(401).json({error:'Invalid credentials'});
     // Issue JWT
     const secret = process.env.JWT_SECRET || 'dev_jwt_secret_change_me';
-    const token = jwt.sign({id: user.id, name: user.name}, secret, {expiresIn: '7d'});
-    res.json({ok:true,name:user.name, token});
+  const token = jwt.sign({id: user.id, name: user.name}, secret, {expiresIn: '7d'});
+  res.cookie('ml_token', token, {httpOnly: true, sameSite: 'Lax'});
+  res.json({ok:true,name:user.name, token});
   }catch(err){
     console.error(err);
     res.status(500).json({error:'Server error'});
@@ -57,17 +64,26 @@ app.post('/api/login', async (req,res)=>{
 });
 
 // Protected endpoint for client to get current user
-app.get('/api/me', async (req, res) => {
-  const auth = req.headers.authorization;
-  if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({error: 'Missing token'});
-  const token = auth.split(' ')[1];
-  const secret = process.env.JWT_SECRET || 'dev_jwt_secret_change_me';
+const authMiddleware = (req, res, next) => {
+  const token = (req.headers.authorization && req.headers.authorization.split(' ')[1]) || req.cookies && req.cookies.ml_token;
+  if (!token) return res.status(401).json({error: 'Missing token'});
   try {
+    const secret = process.env.JWT_SECRET || 'dev_jwt_secret_change_me';
     const payload = jwt.verify(token, secret);
-    res.json({ok:true, user: payload});
+    req.user = payload;
+    return next();
   } catch (err) {
     return res.status(401).json({error: 'Invalid token'});
   }
+};
+
+app.get('/api/me', authMiddleware, async (req, res) => {
+  res.json({ok:true, user: req.user});
+});
+
+// Protect the dashboard static page
+app.get('/dashboard.html', authMiddleware, (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
 const PORT = process.env.PORT || 3001;
