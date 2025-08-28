@@ -39,33 +39,76 @@
         }
 
         header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             width: 100%;
+            margin-bottom: 30px;
         }
 
-        header h1 {
-            font-size: 2.8rem;
+        .hero {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 28px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        .hero-left {
+            flex: 1;
+        }
+
+        .hero-logo {
+            width: 120px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2));
+            padding: 8px;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
             color: #2c3e50;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
 
-        header p {
-            font-size: 1.2rem;
-            color: #7f8c8d;
+        .hero p {
+            font-size: 1rem;
+            color: #6b7a86;
         }
 
-        .logo {
-            font-size: 3rem;
-            color: #e74c3c;
-            margin-bottom: 15px;
+        .hero-cta {
+            display: flex;
+            gap: 12px;
+            margin-top: 14px;
         }
 
-        .card {
+        .secondary-btn {
+            background: white;
+            color: #2c3e50;
+            border: 2px solid #e9eef2;
+            padding: 12px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .hero-right {
+            width: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-mock {
+            width: 220px;
+            border-radius: 24px;
+            padding: 12px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(250,250,250,0.95));
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+    .card {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             padding: 30px;
@@ -344,11 +387,22 @@
 <body>
     <div class="container">
         <header>
-            <div class="logo">
-                <i class="fas fa-dumbbell"></i>
+            <div class="hero">
+                <div class="hero-left">
+                    <img src="assets/logo.svg" alt="Macros Lab logo" class="hero-logo">
+                    <h1>Macros Lab Diet Planner</h1>
+                    <p>Get a science-backed, personalized diet plan tailored to your goals, activity and preferences. Fast, clear, and practical.</p>
+                    <div class="hero-cta">
+                        <button class="btn" id="scroll-to-form"><i class="fas fa-calculator"></i> Generate Plan</button>
+                        <button class="secondary-btn" id="learn-more">Learn More</button>
+                    </div>
+                </div>
+                <div class="hero-right">
+                    <div class="phone-mock">
+                        <img src="assets/logo.svg" alt="app preview" style="width:100%;opacity:0.95">
+                    </div>
+                </div>
             </div>
-            <h1>Macros Lab Diet Planner</h1>
-            <p>Get your personalized diet plan based on your goals and preferences</p>
         </header>
         
         <div class="card">
@@ -580,6 +634,17 @@
                 
                 // Scroll to the diet plan
                 dietPlanSection.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Hero CTA scroll
+            const heroBtn = document.getElementById('scroll-to-form');
+            const learnBtn = document.getElementById('learn-more');
+            heroBtn && heroBtn.addEventListener('click', () => {
+                document.getElementById('age').focus();
+                document.getElementById('diet-form').scrollIntoView({ behavior: 'smooth' });
+            });
+            learnBtn && learnBtn.addEventListener('click', () => {
+                alert('Macros Lab helps you generate balanced diet plans quickly. Fill the form to get started.');
             });
             
             function calculateBMI(height, weight) {
