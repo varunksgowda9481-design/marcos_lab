@@ -1,0 +1,10 @@
+:root{
+  --muted:#6c757d;
+}
+body{background:linear-gradient(180deg,#f7f9fb,#eef3f8);font-family:Segoe UI,system-ui,-apple-system,Roboto,\"Helvetica Neue\",Arial}
+.card{border-radius:12px}
+.stat{font-size:1rem;color:var(--muted);}
+#plans-list .accordion-button{font-weight:600}
+#plans-list .plan-meta{font-size:0.9rem;color:var(--muted)}
+.owner-badge{font-weight:700}
+@media (max-width:768px){ .col-lg-7{order:2} .col-lg-5{order:1} }
