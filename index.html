@@ -763,18 +763,48 @@
                 document.getElementById('fiber-value').textContent = `${totalFiber}g`;
             }
 
-            // PDF download handler
+            // PDF download handler (multi-page)
             document.getElementById('download-pdf').addEventListener('click', async function(){
                 const plan = document.getElementById('diet-plan');
                 if (!plan) return;
                 const { jsPDF } = window.jspdf;
-                const canvas = await html2canvas(plan, { scale: 2 });
-                const imgData = canvas.toDataURL('image/png');
+                // Render the full plan to a high-resolution canvas
+                const canvas = await html2canvas(plan, { scale: 2, useCORS: true });
+                const imgWidth = canvas.width;
+                const imgHeight = canvas.height;
+
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const imgProps = pdf.getImageProperties(imgData);
                 const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+
+                // px per mm ratio
+                const pxPerMm = imgWidth / pdfWidth;
+                const sliceHeightPx = Math.floor(pdfHeight * pxPerMm);
+
+                let yPos = 0;
+                let page = 0;
+                while (yPos < imgHeight) {
+                    const h = Math.min(sliceHeightPx, imgHeight - yPos);
+                    // create temporary canvas for the slice
+                    const tmpCanvas = document.createElement('canvas');
+                    tmpCanvas.width = imgWidth;
+                    tmpCanvas.height = h;
+                    const ctx = tmpCanvas.getContext('2d');
+                    // white background
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+                    ctx.drawImage(canvas, 0, yPos, imgWidth, h, 0, 0, imgWidth, h);
+
+                    const imgData = tmpCanvas.toDataURL('image/png');
+                    const sliceHeightMm = h / pxPerMm;
+
+                    if (page > 0) pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, sliceHeightMm);
+
+                    yPos += h;
+                    page++;
+                }
+
                 pdf.save('macros-lab-diet-plan.pdf');
             });
             
