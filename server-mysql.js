@@ -12,6 +12,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname)));
 
+// Simple root health-check route
+app.get('/', (req, res) => {
+  res.send('✅ Macros Lab backend is running!');
+});
+
 const isProd = process.env.NODE_ENV === 'production';
 
 // Ensure a CSRF cookie is present (double-submit cookie pattern)
