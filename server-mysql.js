@@ -45,7 +45,7 @@ async function getPool(){
   return mysql.createPool(dbConfig);
 }
 
-app.post('/api/register', async (req,res)=>{
+app.post('/api/register', verifyCsrf, async (req,res)=>{
   const {name,email,password} = req.body;
   if (!email || !password) return res.status(400).json({error:'Email and password required'});
   try{
@@ -65,7 +65,7 @@ app.post('/api/register', async (req,res)=>{
   }
 });
 
-app.post('/api/login', async (req,res)=>{
+app.post('/api/login', verifyCsrf, async (req,res)=>{
   const {email,password} = req.body;
   if (!email || !password) return res.status(400).json({error:'Email and password required'});
   try{
@@ -119,7 +119,7 @@ app.get('/dashboard.html', authMiddleware, (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
-app.post('/api/logout', (req, res) => {
+app.post('/api/logout', verifyCsrf, (req, res) => {
   try {
     const token = req.cookies && req.cookies.ml_token;
     if (token) {
