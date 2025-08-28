@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Login - Macros Lab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card" style="max-width:420px;margin:60px auto;">
+      <h2 class="card-title">Login to Macros Lab</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input id="email" type="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" type="password" required>
+        </div>
+        <button class="btn" type="submit">Login</button>
+        <p style="margin-top:12px;text-align:center">Don't have an account? <a href="register.html">Register</a></p>
+        <div id="msg" style="margin-top:12px;color:#c0392b"></div>
+      </form>
+    </div>
+  </div>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const res = await fetch('/api/login', {
+        method: 'POST', headers: {'content-type':'application/json'},
+        body: JSON.stringify({email,password})
+      });
+      const data = await res.json();
+      const msg = document.getElementById('msg');
+      if (res.ok) {
+        msg.style.color = '#27ae60';
+        msg.textContent = 'Login successful';
+        // redirect to main page
+        setTimeout(()=> location.href='index.html',700);
+      } else {
+        msg.style.color = '#c0392b';
+        msg.textContent = data.error || 'Login failed';
+      }
+    });
+  </script>
+</body>
+</html>

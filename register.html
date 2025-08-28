@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Register - Macros Lab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card" style="max-width:420px;margin:60px auto;">
+      <h2 class="card-title">Create an account</h2>
+      <form id="reg-form">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input id="name" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input id="email" type="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" type="password" required>
+        </div>
+        <button class="btn" type="submit">Register</button>
+        <p style="margin-top:12px;text-align:center">Already have an account? <a href="login.html">Login</a></p>
+        <div id="msg" style="margin-top:12px;color:#c0392b"></div>
+      </form>
+    </div>
+  </div>
+  <script>
+    document.getElementById('reg-form').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const res = await fetch('/api/register', {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({name,email,password})});
+      const data = await res.json();
+      const msg = document.getElementById('msg');
+      if (res.ok) {
+        msg.style.color = '#27ae60';
+        msg.textContent = 'Registered. Redirecting to login...';
+        setTimeout(()=> location.href='login.html',900);
+      } else {
+        msg.style.color = '#c0392b';
+        msg.textContent = data.error || 'Registration failed';
+      }
+    });
+  </script>
+</body>
+</html>
