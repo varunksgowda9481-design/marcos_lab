@@ -40,8 +40,9 @@
       const msg = document.getElementById('msg');
       if (res.ok) {
         msg.style.color = '#27ae60';
-        msg.textContent = 'Registered. Redirecting to login...';
-        setTimeout(()=> location.href='login.html',900);
+        msg.textContent = 'Registered. Redirecting...';
+        if (data.token) localStorage.setItem('ml_token', data.token);
+        setTimeout(()=> location.href='dashboard.html',900);
       } else {
         msg.style.color = '#c0392b';
         msg.textContent = data.error || 'Registration failed';

@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const path = require('path');
 
 const app = express();
@@ -45,10 +46,27 @@ app.post('/api/login', async (req,res)=>{
     const user = rows[0];
     const ok = await bcrypt.compare(password,user.password);
     if (!ok) return res.status(401).json({error:'Invalid credentials'});
-    res.json({ok:true,name:user.name});
+    // Issue JWT
+    const secret = process.env.JWT_SECRET || 'dev_jwt_secret_change_me';
+    const token = jwt.sign({id: user.id, name: user.name}, secret, {expiresIn: '7d'});
+    res.json({ok:true,name:user.name, token});
   }catch(err){
     console.error(err);
     res.status(500).json({error:'Server error'});
+  }
+});
+
+// Protected endpoint for client to get current user
+app.get('/api/me', async (req, res) => {
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({error: 'Missing token'});
+  const token = auth.split(' ')[1];
+  const secret = process.env.JWT_SECRET || 'dev_jwt_secret_change_me';
+  try {
+    const payload = jwt.verify(token, secret);
+    res.json({ok:true, user: payload});
+  } catch (err) {
+    return res.status(401).json({error: 'Invalid token'});
   }
 });
 
