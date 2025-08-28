@@ -114,6 +114,77 @@ app.get('/api/me', authMiddleware, async (req, res) => {
   res.json({ok:true, user: req.user});
 });
 
+// Return plans (reads from data/diet-plans.json) with optional search
+app.get('/api/plans', async (req, res) => {
+  try {
+    const q = (req.query.search || '').toLowerCase().trim();
+    const plansPath = path.join(__dirname, 'data', 'diet-plans.json');
+    const raw = await require('fs').promises.readFile(plansPath, 'utf8');
+    let plans = JSON.parse(raw || '[]');
+    if (q) {
+      plans = plans.filter(p => JSON.stringify(p).toLowerCase().includes(q));
+    }
+    res.json({ok:true, plans});
+  } catch (err) {
+    console.error('Failed to load plans', err);
+    res.status(500).json({error:'Failed to load plans'});
+  }
+});
+
+// Persist progress entries. If user authenticated, associate with user id; otherwise allow null owner.
+app.post('/api/progress', verifyCsrf, async (req, res) => {
+  const { date, weight, calories } = req.body || {};
+  if (!date) {
+    return res.status(400).json({ error: 'date required' });
+  }
+  try {
+    const pool = await getPool();
+    // try to get user id from token if present
+    let userId = null;
+    try {
+      const token = (req.cookies && req.cookies.ml_token) || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+      if (token) {
+        const secret = process.env.JWT_SECRET || 'dev_jwt_secret_change_me';
+        const payload = jwt.verify(token, secret);
+        userId = payload.id || null;
+      }
+    } catch (e) { /* not authenticated */ }
+
+    await pool.query('INSERT INTO progress (user_id, entry_date, weight, calories, created_at) VALUES (?,?,?,?,NOW())', [userId, date, weight || null, calories || null]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Failed to save progress', err);
+    res.status(500).json({ error: 'Failed to save progress' });
+  }
+});
+
+// Fetch progress entries for the current user (or anonymous entries)
+app.get('/api/progress', async (req, res) => {
+  try {
+    const pool = await getPool();
+    let userId = null;
+    try {
+      const token = (req.cookies && req.cookies.ml_token) || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+      if (token) {
+        const secret = process.env.JWT_SECRET || 'dev_jwt_secret_change_me';
+        const payload = jwt.verify(token, secret);
+        userId = payload.id || null;
+      }
+    } catch (e) { /* ignore */ }
+
+    let rows;
+    if (userId) {
+      [rows] = await pool.query('SELECT entry_date as date, weight, calories FROM progress WHERE user_id = ? ORDER BY entry_date ASC', [userId]);
+    } else {
+      [rows] = await pool.query('SELECT entry_date as date, weight, calories FROM progress WHERE user_id IS NULL ORDER BY entry_date ASC');
+    }
+    res.json({ ok: true, progress: rows });
+  } catch (err) {
+    console.error('Failed to fetch progress', err);
+    res.status(500).json({ error: 'Failed to fetch progress' });
+  }
+});
+
 // Protect the dashboard static page
 app.get('/dashboard.html', authMiddleware, (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboard.html'));

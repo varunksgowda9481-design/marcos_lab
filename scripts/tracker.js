@@ -115,7 +115,9 @@
 
   function computeTotals(p){
     let protein=0, carbs=0, fat=0, calories=0;
-    if (!p.meals) return {protein,carbs,fat,calories};
+    if (!p.meals) {
+      return {protein,carbs,fat,calories};
+    }
     p.meals.forEach(m=>{
       m.items && m.items.forEach(it=>{
         protein += +(it.protein||0);
@@ -130,7 +132,9 @@
   // search
   function doSearch(){
     const q = (search.value||'').toLowerCase().trim();
-    if (!q) return renderPlans(plans);
+    if (!q) {
+      return renderPlans(plans);
+    }
     const filtered = plans.filter(p=>{
       const hay = JSON.stringify(p).toLowerCase();
       return hay.indexOf(q) !== -1;
@@ -156,7 +160,9 @@
   addProgressBtn.addEventListener('click', ()=>{
     const date = progressDate.value;
     const weight = progressWeight.value ? +progressWeight.value : null;
-    if (!date) return alert('Pick a date');
+    if (!date) {
+      return alert('Pick a date');
+    }
     addProgress({date,weight});
     progressDate.value = '';
     progressWeight.value = '';
@@ -164,13 +170,19 @@
 
   exportProgressCsv.addEventListener('click', ()=>{
     const arr = getProgress();
-    if (!arr.length) return alert('No progress to export');
+    if (!arr.length) {
+      return alert('No progress to export');
+    }
     const csv = ['date,weight,calories'].concat(arr.map(r=>`${r.date||''},${r.weight||''},${r.calories||''}`)).join('\n');
     downloadText('progress.csv', csv);
   });
 
   resetProgress.addEventListener('click', ()=>{
-    if (!confirm('Reset progress?')) return; localStorage.removeItem('ml_progress'); renderChart();
+    if (!confirm('Reset progress?')) {
+      return;
+    }
+    localStorage.removeItem('ml_progress');
+    renderChart();
   });
 
   clearSelection.addEventListener('click', ()=>{
@@ -179,7 +191,9 @@
 
   exportSelected.addEventListener('click', ()=>{
     const s = localStorage.getItem('ml_last_selection');
-    if (!s) return alert('No selection');
+    if (!s) {
+      return alert('No selection');
+    }
     const p = JSON.parse(s);
     // build CSV from plan meals
     let rows = ['meal,item,quantity,protein,carbs,fat,calories'];
@@ -216,6 +230,9 @@
 
   // init
   renderPlans(plans);
-  const last = localStorage.getItem('ml_last_selection'); if (last) selectPlan(JSON.parse(last));
+  const last = localStorage.getItem('ml_last_selection');
+  if (last) {
+    selectPlan(JSON.parse(last));
+  }
   renderChart();
 })();
