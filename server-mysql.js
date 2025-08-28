@@ -86,5 +86,10 @@ app.get('/dashboard.html', authMiddleware, (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
+app.post('/api/logout', (req, res) => {
+  res.clearCookie('ml_token');
+  res.json({ok:true});
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, ()=> console.log('Server running on',PORT));

@@ -16,14 +16,15 @@
   </div>
   <script>
     async function load(){
-      const token = localStorage.getItem('ml_token');
-      if (!token) return location.href='login.html';
-      const res = await fetch('/api/me', {headers:{'authorization':'Bearer '+token}});
+      const res = await fetch('/api/me');
       if (!res.ok) return location.href='login.html';
       const data = await res.json();
       document.getElementById('user-info').textContent = 'Hello, ' + (data.user.name || data.user.id);
     }
-    document.getElementById('logout').addEventListener('click', ()=>{ localStorage.removeItem('ml_token'); location.href='login.html'; });
+    document.getElementById('logout').addEventListener('click', async ()=>{
+      await fetch('/api/logout', {method:'POST'});
+      location.href='login.html';
+    });
     load();
   </script>
 </body>
