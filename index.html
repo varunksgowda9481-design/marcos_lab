@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Macros Lab - Diet Plan Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF generation libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -506,6 +509,9 @@
         <div class="diet-plan" id="diet-plan">
             <div class="card">
                 <h2 class="card-title">Your Personalized Diet Plan</h2>
+                    <div style="text-align:right;margin-bottom:10px;">
+                        <button id="download-pdf" class="btn" style="display:inline-block;max-width:220px;"> <i class="fas fa-download"></i> Download PDF</button>
+                    </div>
                 
                 <div class="water-intake">
                     <div class="water-icon">💧</div>
@@ -756,6 +762,21 @@
                 document.getElementById('fat-value').textContent = `${totalFat}g`;
                 document.getElementById('fiber-value').textContent = `${totalFiber}g`;
             }
+
+            // PDF download handler
+            document.getElementById('download-pdf').addEventListener('click', async function(){
+                const plan = document.getElementById('diet-plan');
+                if (!plan) return;
+                const { jsPDF } = window.jspdf;
+                const canvas = await html2canvas(plan, { scale: 2 });
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('macros-lab-diet-plan.pdf');
+            });
             
             function generateVegPlan(meals, calories, goal) {
                 let totalProtein = 0;
