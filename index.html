@@ -24,6 +24,39 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
+        }
+
+        /* Decorative SVG backgrounds behind content */
+        .container::before,
+        .container::after {
+            content: '';
+            position: absolute;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.28;
+            filter: blur(8px) saturate(110%);
+        }
+
+        .container::before {
+            background-image: url('assets/food-bg.svg');
+            background-repeat: no-repeat;
+            background-size: 420px auto;
+            width: 420px;
+            height: 280px;
+            left: -40px;
+            top: 80px;
+        }
+
+        .container::after {
+            background-image: url('assets/workout-bg.svg');
+            background-repeat: no-repeat;
+            background-size: 420px auto;
+            width: 420px;
+            height: 280px;
+            right: -40px;
+            bottom: 40px;
+            transform: scaleX(-1);
         }
 
         @keyframes gradientBG {

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="foodTitle">
+  <title id="foodTitle">Decorative food background</title>
+  <defs>
+    <linearGradient id="fgrad" x1="0" x2="1">
+      <stop offset="0%" stop-color="#ffb86b" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#ff6b6b" stop-opacity="0.95"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#fgrad)" opacity="0.95">
+    <circle cx="120" cy="100" r="90" />
+    <rect x="60" y="70" width="120" height="60" rx="30" ry="30" fill="#fff" opacity="0.06"/>
+    <g transform="translate(340,50) scale(0.9)" fill="#fff" opacity="0.08">
+      <path d="M40 10 a30 20 0 1 0 80 0 a30 20 0 1 0 -80 0" />
+    </g>
+  </g>
+  <g fill="#fff" opacity="0.12">
+    <path d="M420 320c-30-20-80-10-110 12 35 30 90 34 122 10 0 0-3-5-12-22z"/>
+    <circle cx="480" cy="280" r="30"/>
+  </g>
+</svg>
