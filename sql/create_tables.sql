@@ -1,0 +1,18 @@
+-- Run this in your MySQL client to create required tables
+CREATE DATABASE IF NOT EXISTS macros_lab;
+USE macros_lab;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255),
+  email VARCHAR(255) UNIQUE,
+  password VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS revoked_tokens (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  jti VARCHAR(100) NOT NULL,
+  revoked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX (jti)
+);
