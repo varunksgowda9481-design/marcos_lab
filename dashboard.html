@@ -22,7 +22,8 @@
       document.getElementById('user-info').textContent = 'Hello, ' + (data.user.name || data.user.id);
     }
     document.getElementById('logout').addEventListener('click', async ()=>{
-      await fetch('/api/logout', {method:'POST'});
+      const csrf = document.cookie.split('; ').find(r=>r.startsWith('csrf_token='))?.split('=')[1];
+      await fetch('/api/logout', {method:'POST', headers: {'x-csrf-token': csrf || ''}});
       location.href='login.html';
     });
     load();

@@ -35,7 +35,8 @@
       const name = document.getElementById('name').value;
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      const res = await fetch('/api/register', {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({name,email,password})});
+  const csrf = document.cookie.split('; ').find(r=>r.startsWith('csrf_token='))?.split('=')[1];
+  const res = await fetch('/api/register', {method:'POST', headers:{'content-type':'application/json', 'x-csrf-token': csrf || ''}, body: JSON.stringify({name,email,password})});
       const data = await res.json();
       const msg = document.getElementById('msg');
       if (res.ok) {

@@ -12,6 +12,28 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname)));
 
+const isProd = process.env.NODE_ENV === 'production';
+
+// Ensure a CSRF cookie is present (double-submit cookie pattern)
+app.use((req, res, next) => {
+  try {
+    if (!req.cookies || !req.cookies.csrf_token) {
+      const csrf = randomUUID();
+      res.cookie('csrf_token', csrf, { sameSite: 'Lax', secure: isProd });
+    }
+  } catch (e) {}
+  next();
+});
+
+function verifyCsrf(req, res, next) {
+  // Only enforce for state-changing requests
+  if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return next();
+  const header = req.get('x-csrf-token');
+  const cookie = req.cookies && req.cookies.csrf_token;
+  if (!header || !cookie || header !== cookie) return res.status(403).json({ error: 'Invalid CSRF token' });
+  return next();
+}
+
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',

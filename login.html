@@ -30,8 +30,9 @@
       e.preventDefault();
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
+      const csrf = document.cookie.split('; ').find(r=>r.startsWith('csrf_token='))?.split('=')[1];
       const res = await fetch('/api/login', {
-        method: 'POST', headers: {'content-type':'application/json'},
+        method: 'POST', headers: {'content-type':'application/json', 'x-csrf-token': csrf || ''},
         body: JSON.stringify({email,password})
       });
       const data = await res.json();
