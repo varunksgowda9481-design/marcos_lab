@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+<<<<<<< HEAD
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const ExpressBrute = require('express-brute');
@@ -12,10 +13,13 @@ const sqlite3 = require('sqlite3').verbose();
 const { v4: uuidv4 } = require('uuid');
 const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
+=======
+>>>>>>> 143111130afd8df734b4fb919fd2b8655baa0146
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+<<<<<<< HEAD
 // ==================== ENV VALIDATION ====================
 const validateEnv = require('./config/env');
 
@@ -197,6 +201,13 @@ async function initDatabase() {
   }
 }
 
+=======
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
+>>>>>>> 143111130afd8df734b4fb919fd2b8655baa0146
 // Sample diet plans data structure
 const dietPlans = {
   "vegetarian": {
@@ -241,6 +252,7 @@ const dietPlans = {
   }
 };
 
+<<<<<<< HEAD
 // Authentication middleware
 const authMiddleware = async (req, res, next) => {
   try {
@@ -276,6 +288,10 @@ const verifyCsrf = (req, res, next) => {
 
 // API endpoint to generate diet plan
 app.post('/api/generate-plan', authMiddleware, async (req, res) => {
+=======
+// API endpoint to generate diet plan
+app.post('/generate-plan', (req, res) => {
+>>>>>>> 143111130afd8df734b4fb919fd2b8655baa0146
   const userData = req.body;
   
   // Basic validation
@@ -319,6 +335,7 @@ app.post('/api/generate-plan', authMiddleware, async (req, res) => {
     userData: userData
   };
   
+<<<<<<< HEAD
   // Save to database
   try {
     const pool = await getPool();
@@ -367,10 +384,30 @@ app.post('/api/generate-plan', authMiddleware, async (req, res) => {
       });
     });
   }
+=======
+  // Save to JSON file (simple database)
+  fs.readFile('data/diet-plans.json', 'utf8', (err, data) => {
+    let plans = [];
+    if (!err && data) {
+      plans = JSON.parse(data);
+    }
+    plans.push({
+      timestamp: new Date().toISOString(),
+      ...response
+    });
+    
+    fs.writeFile('data/diet-plans.json', JSON.stringify(plans, null, 2), (err) => {
+      if (err) {
+        console.error('Error saving diet plan:', err);
+      }
+    });
+  });
+>>>>>>> 143111130afd8df734b4fb919fd2b8655baa0146
   
   res.json(response);
 });
 
+<<<<<<< HEAD
 // API endpoint to get all saved plans (for authenticated users)
 app.get('/api/plans', authMiddleware, async (req, res) => {
   try {
@@ -530,16 +567,37 @@ app.use((error, req, res, next) => {
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   
+=======
+// API endpoint to get all saved plans (for debugging)
+app.get('/plans', (req, res) => {
+  fs.readFile('data/diet-plans.json', 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: 'Unable to read plans data' });
+    }
+    res.json(JSON.parse(data));
+  });
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+>>>>>>> 143111130afd8df734b4fb919fd2b8655baa0146
   // Create data directory if it doesn't exist
   if (!fs.existsSync('data')) {
     fs.mkdirSync('data');
   }
+<<<<<<< HEAD
   
+=======
+>>>>>>> 143111130afd8df734b4fb919fd2b8655baa0146
   // Initialize empty JSON file if it doesn't exist
   if (!fs.existsSync('data/diet-plans.json')) {
     fs.writeFileSync('data/diet-plans.json', '[]');
   }
+<<<<<<< HEAD
   
   // Initialize database
   await initDatabase();
+=======
+>>>>>>> 143111130afd8df734b4fb919fd2b8655baa0146
 });
