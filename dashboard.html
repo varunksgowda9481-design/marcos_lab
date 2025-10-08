@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dashboard - Macros Lab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card" style="max-width:900px;margin:60px auto;">
+      <h2 class="card-title">Welcome</h2>
+      <div id="user-info">Loading...</div>
+      <button class="btn" id="logout">Logout</button>
+    </div>
+  </div>
+  <script>
+    async function load(){
+      const res = await fetch('/api/me');
+      if (!res.ok) return location.href='login.html';
+      const data = await res.json();
+      document.getElementById('user-info').textContent = 'Hello, ' + (data.user.name || data.user.id);
+    }
+    document.getElementById('logout').addEventListener('click', async ()=>{
+      const csrf = document.cookie.split('; ').find(r=>r.startsWith('csrf_token='))?.split('=')[1];
+      await fetch('/api/logout', {method:'POST', headers: {'x-csrf-token': csrf || ''}});
+      location.href='login.html';
+    });
+    load();
+  </script>
+</body>
+</html>
